@@ -174,10 +174,11 @@ function Reporting() {
 function Analysis() {
   const [fields, setFields] = useState(EMPTY);
   const [errors, setErrors] = useState({});
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [honey, setHoney] = useState("");
 
   function set(key, value) {
-    setSent(false);
+    setStatus((current) => (current === "sending" ? current : null));
     setFields((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: undefined }));
   }
@@ -199,14 +200,31 @@ function Analysis() {
     return next;
   }
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault();
     const next = validate();
     setErrors(next);
-    if (Object.keys(next).length) return;
-    const href = mailtoHref(fields);
-    setSent(true);
-    window.location.href = href;
+    if (Object.keys(next).length || status === "sending") return;
+    if (honey) {
+      setStatus("sent");
+      return;
+    }
+    setStatus("sending");
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(MAIL)}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(requestPayload(fields)),
+      });
+      const data = await response.json().catch(() => ({}));
+      const accepted = response.ok && data.success !== false && data.success !== "false";
+      setStatus(accepted ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
   }
 
   const rentLabel = fields.vacant
@@ -226,7 +244,7 @@ function Analysis() {
         </p>
       </div>
       <div className="analysis">
-        <form className="form" onSubmit={submit} noValidate>
+        <form className="form" onSubmit={submit} noValidate aria-busy={status === "sending"}>
           <div className="form-grid">
             <label>
               Name
@@ -358,12 +376,27 @@ function Analysis() {
               Not currently rented
             </label>
           </div>
-          <button className="btn btn-primary" type="submit">
-            Request the free analysis
+          <label className="honey" aria-hidden="true">
+            Company
+            <input
+              name="_honey"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honey}
+              onChange={(event) => setHoney(event.target.value)}
+            />
+          </label>
+          <button className="btn btn-primary" type="submit" disabled={status === "sending" || status === "sent"}>
+            {status === "sending" ? "Sending…" : status === "sent" ? "Request sent" : "Request the free analysis"}
           </button>
+          {status === "error" && (
+            <p className="error" role="alert">
+              The request did not go through. Write to us at <a href={mailtoHref(fields)}>{MAIL}</a> with the same details.
+            </p>
+          )}
         </form>
         <aside className="summary" aria-live="polite">
-          <p className="kicker">{sent ? "Request ready" : "For the analysis"}</p>
+          <p className="kicker">{status === "sent" ? "Request sent" : "For the analysis"}</p>
           <p className="figure">{rentLabel}</p>
           <p className="figure-note">
             {fields.vacant
@@ -378,14 +411,16 @@ function Analysis() {
             </li>
             <li>{[fields.furnished, fields.condition].filter(Boolean).join(" · ") || "Furnishing and state not entered"}</li>
           </ul>
-          {sent ? (
-            <>
-              <p>
-                This is a request for an estimate, not the estimate. We still have to look
-                at the apartment. If your email app did not open, send the same details to{" "}
-                <a href={mailtoHref(fields)}>{MAIL}</a>.
-              </p>
-            </>
+          {status === "sent" ? (
+            <p>
+              This is a request for an estimate, not the estimate. We have the details and
+              will reply to {fields.email.trim()} after we have looked at the apartment.
+            </p>
+          ) : status === "error" ? (
+            <p>
+              The request did not go through. Write to us at{" "}
+              <a href={mailtoHref(fields)}>{MAIL}</a> with the same details.
+            </p>
           ) : (
             <p>
               An income figure here would be a guess. Send the apartment and we will come
@@ -397,6 +432,25 @@ function Analysis() {
       </div>
     </section>
   );
+}
+
+function requestPayload(fields) {
+  const rent = fields.vacant ? "Not currently rented" : `${fields.rent} GEL per month`;
+  return {
+    name: fields.name.trim(),
+    email: fields.email.trim(),
+    phone: fields.phone.trim() || "—",
+    address: fields.address.trim(),
+    bedrooms: fields.bedrooms,
+    size: `${fields.sqm} m²`,
+    furnished: fields.furnished,
+    state: fields.condition,
+    current_monthly_rent: rent,
+    _subject: `Free apartment analysis — ${fields.address.trim()}`,
+    _template: "table",
+    _captcha: "false",
+    _replyto: fields.email.trim(),
+  };
 }
 
 function mailtoHref(fields) {
