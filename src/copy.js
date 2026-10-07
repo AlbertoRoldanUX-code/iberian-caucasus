@@ -208,6 +208,16 @@ export const copy = {
       sentAfter: "after we have looked at the apartment.",
       idle: "An income figure here would be a guess. Send the apartment and we will come back with an analysis: whether short or mid-stay is worth it, and the fee, which starts from 20%.",
     },
+    offline: {
+      meta: {
+        title: "Iberian Caucasus",
+        description: "This website is not in production.",
+      },
+      kicker: "Iberian Caucasus",
+      title: "This website is not in production.",
+      lede: "The public site is offline. It is not taking analysis requests or owner logins.",
+      contact: "For an existing matter, write to Alberto Roldán.",
+    },
     mail: {
       subject: (address) => `Free apartment analysis — ${address}`,
       intro: "Free apartment analysis",
@@ -436,6 +446,16 @@ export const copy = {
       sentBefore: "ეს შეფასების მოთხოვნაა, არა თავად შეფასება. დეტალები მივიღეთ და ბინის ნახვის შემდეგ გიპასუხებთ:",
       sentAfter: "",
       idle: "შემოსავლის ციფრი აქ ვარაუდი იქნებოდა. გამოგვიგზავნეთ ბინა და ანალიზით დაგიბრუნდებით: ღირს თუ არა მოკლე ან საშუალოვადიანი და რა იქნება საკომისიო. ის 20%-იდან იწყება.",
+    },
+    offline: {
+      meta: {
+        title: "Iberian Caucasus",
+        description: "ეს ვებსაიტი აღარ არის გაშვებული.",
+      },
+      kicker: "Iberian Caucasus",
+      title: "ეს ვებსაიტი აღარ არის გაშვებული.",
+      lede: "საჯარო საიტი გამორთულია. ანალიზის მოთხოვნებსა და მფლობელის შესვლას აქ აღარ იღებს.",
+      contact: "არსებულ საკითხზე მისწერეთ ალბერტო როლდანს.",
     },
     mail: {
       subject: (address) => `ბინის უფასო ანალიზი — ${address}`,

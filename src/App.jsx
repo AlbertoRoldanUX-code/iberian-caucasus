@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Brand } from "./components/Brand";
 import { copy } from "./copy";
 import { useI18n } from "./i18n";
+import { inProduction } from "./production";
 
 const MAIL = "alberto@iberiancaucasus.com";
 const FORMSUBMIT = "9bc1fdb2cb99786bdb702f84ab4e38c9";
@@ -21,6 +22,34 @@ const EMPTY = {
 };
 
 export default function App() {
+  if (!inProduction) return <Offline />;
+  return <Site />;
+}
+
+function Offline() {
+  const { t } = useI18n();
+  return (
+    <>
+      <header className="nav">
+        <div className="nav-bar wrap">
+          <Brand />
+          <LanguageSwitch />
+        </div>
+      </header>
+      <main id="top" className="wrap offline">
+        <p className="kicker">{t.offline.kicker}</p>
+        <h1>{t.offline.title}</h1>
+        <p className="lede">{t.offline.lede}</p>
+        <p>{t.offline.contact}</p>
+        <a className="contact-mail" href={`mailto:${MAIL}`}>
+          {MAIL}
+        </a>
+      </main>
+    </>
+  );
+}
+
+function Site() {
   const { t } = useI18n();
   const [view, setView] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
