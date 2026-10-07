@@ -1,3 +1,5 @@
+import { useI18n } from "../i18n";
+
 export function Mark() {
   return (
     <svg className="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
@@ -12,13 +14,14 @@ export function Mark() {
   );
 }
 
-export function Brand() {
+export function Brand({ onClick }) {
+  const { t } = useI18n();
   return (
-    <a className="brand" href="#top">
+    <a className="brand" href="#top" onClick={onClick}>
       <Mark />
       <span>
         <strong>Iberian Caucasus</strong>
-        <small>Tbilisi</small>
+        <small>{t.city}</small>
       </span>
     </a>
   );
