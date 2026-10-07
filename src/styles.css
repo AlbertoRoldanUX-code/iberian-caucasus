@@ -107,17 +107,6 @@ p { margin: 0 0 12px; }
 
 .note { color: var(--muted); font-size: 0.95rem; }
 
-.offline {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: min(38rem, calc(100% - 40px));
-  padding: 72px 0 96px;
-}
-
-.offline h1 { max-width: none; }
-
 .section, .hero { scroll-margin-top: var(--nav); }
 
 .section { padding: 84px 0; }
